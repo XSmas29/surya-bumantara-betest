@@ -1,5 +1,6 @@
 import express from "express";
-import {createUser, getUserByAccountNumber,getUserByUsername} from "../database/controller/user";
+import User from "../database/model";
+import {createUser, getUserByAccountNumber,getUserByUsername, updateUserByAccountNumber} from "../database/controller/user";
 const router = express.Router();
 
 router.post("/", (req, res) => {
@@ -7,29 +8,75 @@ router.post("/", (req, res) => {
   createUser(userName, accountNumber, emailAddress, identityNumber).then(() => {
     res.send("Berhasil Add User");
   }).catch(err => {
-    if (err.code === 11000) res.status(409).send(err.message);
-    res.status(500).send(err.message);
+    res.send(err.message);
   })
 })
 
-router.get("/username/:userName", (req, res) => {
-  const { userName } = req.params;
-  getUserByUsername(userName).then(user => {
-    if (!user) res.status(404).send("User not found");
-    res.send(user);
-  }).catch(err => {
-    res.status(500).send(err.message);
+router.route("/username/:userName")
+  .get((req, res) => {
+    const { userName } = req.params;
+    getUserByUsername(userName).then(user => {
+      if (!user) res.status(404).send("User not found");
+      res.send(user);
+    }).catch(err => {
+      res.send(err.message);
+    })
   })
-})
+  .put(async (req, res) => {
+    const { userName } = req.params;
+    const user = await User.findOne({userName})
+    if (!user) res.status(404).send("User not found");
+    else {
+      user.updateOne(req.body, { runValidators: true, }, err => {
+        if (err) res.send(err.message);
+        else res.send("Berhasil Update User");
+      })
+    }
+  })
+  .delete(async (req, res) => {
+    const { userName } = req.params;
+    const user = await User.findOne({userName})
+    if (!user) res.status(404).send("User not found");
+    else {
+      user.deleteOne(err => {
+        if (err) res.send(err.message);
+        else res.send("Berhasil Delete User");
+      })
+    }
+  })
+    
 
-router.get("/accountNumber/:accountNumber", (req, res) => {
-  const { accountNumber } = req.params;
-  getUserByAccountNumber(+accountNumber).then(user => {
-    if (!user) res.status(404).send("User not found");
-    res.send(user);
-  }).catch(err => {
-    res.status(500).send(err.message);
+router.route("/accountNumber/:accountNumber")
+ .get((req, res) => {
+    const { accountNumber } = req.params;
+    getUserByAccountNumber(+accountNumber).then(user => {
+      if (!user) res.status(404).send("User not found");
+      res.send(user);
+    }).catch(err => {
+      res.send(err.message);
+    })
   })
-})
+  .put(async (req, res) => {
+    const { accountNumber } = req.params;
+    const user = await User.findOne({accountNumber})
+    if (!user) res.status(404).send("User not found");
+    else {
+      user.updateOne(req.body, { runValidators: true, }, err => {
+        if (err) res.send(err.message);
+        else res.send("Berhasil Update User");
+      })
+    }
+  })
+  .delete(async (req, res) => {
+    const { accountNumber } = req.params;
+    const user = await User.findOne({accountNumber})
+    if (!user) res.status(404).send("User not found");
+    else {
+      user.deleteOne(err => {
+        if (err) res.send(err.message);
+        else res.send("Berhasil Delete User");
+      })
+    }
+  })
 
 export default router
