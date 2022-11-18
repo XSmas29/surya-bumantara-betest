@@ -11,7 +11,7 @@ const schema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  emailAdress: {
+  emailAddress: {
     type: String,
     required: true,
     unique: true,

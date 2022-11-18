@@ -3,13 +3,13 @@ import User from "./../model";
 export const createUser = async (
   userName: string, 
   accountNumber: number, 
-  emailAdress: string, 
+  emailAddress: string, 
   identityNumber: number
 ) => {
   const newUser = new User({
     userName,
     accountNumber,
-    emailAdress,
+    emailAddress,
     identityNumber,
   });
   const userSaved = await newUser.save();
