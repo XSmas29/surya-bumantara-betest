@@ -1,5 +1,5 @@
 import User from "./../model";
-
+import { ObjectId } from "mongodb";
 export const createUser = async (
   userName: string, 
   accountNumber: number, 
@@ -14,6 +14,11 @@ export const createUser = async (
   });
   const userSaved = await newUser.save();
   return userSaved;
+}
+
+export const getAllUser = async () => {
+  const users = await User.find();
+  return users;
 }
 
 export const getUserByUsername = async (userName: string) => {
@@ -46,5 +51,16 @@ export const updateUserByAccountNumber = async (
   }, param)
 
   updated.exec()
+  return updated;
+}
+
+export const updateUserById = async (
+  id: string,
+  param: paramUpdateUser
+) => {
+  const updated = User.findOneAndUpdate({
+    _id: new ObjectId(id),
+  }, param)
+
   return updated;
 }
