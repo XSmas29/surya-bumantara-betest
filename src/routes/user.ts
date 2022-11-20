@@ -3,7 +3,13 @@ import User from "../database/model";
 import {createUser, getUserByAccountNumber,getUserByUsername, updateUserByAccountNumber, getAllUser, updateUserById} from "../database/controller/user";
 import { isValidObjectId } from "mongoose";
 import { ObjectId } from "mongodb";
+import { getRedisCLient } from "../redis/index";
+
 const router = express.Router();
+
+const redisClient = getRedisCLient()
+
+const expirationTime = +(process.env.REDIS_EXPIRATION_TIME || 300)
 
 router.post("/", (req, res) => {
   const {userName, accountNumber, emailAddress, identityNumber} = req.body;
@@ -14,12 +20,18 @@ router.post("/", (req, res) => {
   })
 })
 
-router.get("/all", (req, res) => {
-  getAllUser().then((users) => {
-    res.send(users);
-  }).catch(err => {
-    res.send(err.message);
-  })
+router.get("/all", async (req, res) => {
+  const users = await redisClient.get("users").catch(err => console.log(err))
+  if (users) {
+    res.send(JSON.parse(users))
+  } else {
+    getAllUser().then((users) => {
+      redisClient.SETEX("users", expirationTime, JSON.stringify(users))
+      res.send(users);
+    }).catch(err => {
+      res.send(err.message);
+    })
+  }
 })
 
 router.route("/:id")
@@ -42,14 +54,22 @@ router.route("/:id")
 })
 
 router.route("/username/:userName")
-  .get((req, res) => {
+  .get(async (req, res) => {
     const { userName } = req.params;
-    getUserByUsername(userName).then(user => {
-      if (!user) res.status(404).send("User not found");
-      else res.send(user);
-    }).catch(err => {
-      res.send(err.message);
-    })
+    const user = await redisClient.get(`username:${userName}`).catch(err => console.log(err));
+    if (user) {
+      res.send(JSON.parse(user));
+    } else {
+      getUserByUsername(userName).then(user => {
+        if (!user) res.status(404).send("User not found");
+        else {
+          redisClient.SETEX(`username:${userName}`, expirationTime, JSON.stringify(user))
+          res.send(user)
+        }
+      }).catch(err => {
+        res.send(err.message);
+      })
+    }
   })
   // .put(async (req, res) => {
   //   const { userName } = req.params;
@@ -76,14 +96,22 @@ router.route("/username/:userName")
     
 
 router.route("/accountNumber/:accountNumber")
- .get((req, res) => {
+ .get(async (req, res) => {
     const { accountNumber } = req.params;
-    getUserByAccountNumber(+accountNumber).then(user => {
-      if (!user) res.status(404).send("User not found");
-      else res.send(user);
-    }).catch(err => {
-      res.send(err.message);
-    })
+    const user = await redisClient.get(`accountnumber:${accountNumber}`).catch(err => console.log(err));
+    if (user) {
+      res.send(JSON.parse(user));
+    } else {
+      getUserByAccountNumber(+accountNumber).then(user => {
+        if (!user) res.status(404).send("User not found");
+        else {
+          redisClient.SETEX(`accountnumber:${accountNumber}`, expirationTime, JSON.stringify(user))
+          res.send(user);
+        }
+      }).catch(err => {
+        res.send(err.message);
+      })
+    }
   })
   // .put(async (req, res) => {
   //   const { accountNumber } = req.params;
