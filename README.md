@@ -13,6 +13,8 @@
 
 ## Endpoints
 
+***NB: Akan ada delay += 1-2 menit saat data ditambah/diubah karena data disimpan menggunakan cache redis***
+
 ### ` GET /token` 
 Generate JWT token untuk mengakses endpoint
 - Authorization: No
