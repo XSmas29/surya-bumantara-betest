@@ -1,4 +1,3 @@
-import * as redis from "redis";
 export declare const getRedisCLient: () => import("@redis/client").RedisClientType<{
     graph: {
         CONFIG_GET: typeof import("@redis/graph/dist/commands/CONFIG_GET");
@@ -280,4 +279,4 @@ export declare const getRedisCLient: () => import("@redis/client").RedisClientTy
         RESERVE: typeof import("@redis/bloom/dist/commands/top-k/RESERVE");
         reserve: typeof import("@redis/bloom/dist/commands/top-k/RESERVE");
     };
-} & redis.RedisModules, redis.RedisFunctions, redis.RedisScripts>;
+} & import("redis").RedisModules, import("redis").RedisFunctions, import("redis").RedisScripts>;
