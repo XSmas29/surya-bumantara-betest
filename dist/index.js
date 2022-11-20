@@ -14,8 +14,8 @@ app.use(express_1.default.json());
 const PORT = process.env.PORT || 3030;
 app.use('/api/user', auth_1.authenticateToken, user_1.default);
 app.get('/token', (req, res) => {
-    const token = (0, auth_1.createToken)({ userName: "admin" });
-    res.json({ token: token });
+    const token = (0, auth_1.createToken)({ id: Math.random() });
+    res.json({ status: 'ok', token: token });
 });
 app.listen(PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);

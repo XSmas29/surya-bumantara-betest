@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 3030
 app.use('/api/user', authenticateToken, userRouter)
 
 app.get('/token', (req, res) => {
-  const token = createToken({userName: "admin"})
-  res.json({token: token})
+  const token = createToken({id: Math.random()})
+  res.json({status: 'ok', token: token})
 })
 
 app.listen(PORT, () => {
