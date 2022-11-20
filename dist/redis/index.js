@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRedisCLient = void 0;
 const redis_1 = require("redis");
+const REDIS_URL = process.env.REDIS_URL || "redis://redis:6379";
 const getRedisCLient = () => {
-    const client = (0, redis_1.createClient)({ url: "redis://redis:6379" });
+    const client = (0, redis_1.createClient)({ url: REDIS_URL });
     client.on("error", (error) => {
         console.error(error);
     });
